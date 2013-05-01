@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 . ./build_swift_cfg.sh
 
@@ -7,7 +7,7 @@ for zone in ${ZONES[@]};do
 	for node in ${nodes[@]}
 	do
 		echo "stoping swift on nodes@"${node}
-		sshpass -p ${PASS_ROOT} ssh root@${node} swift-init all stop 1>/dev/null 2>&1
+		sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${node} swift-init all stop 1>/dev/null 2>&1
 	done
 done
 
@@ -16,13 +16,13 @@ eval op_host=\${$temp}
 echo "Op host: "${op_host}
 
 echo "Remove the old swift"
-sshpass -p ${PASS_ROOT} ssh root@${op_host} rm -r -f -v ${CONF_DIR}/*.builder
-sshpass -p ${PASS_ROOT} ssh root@${op_host} rm -r -f -v ${CONF_DIR}/*.ring.gz
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} rm -r -f -v ${CONF_DIR}/*.builder
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} rm -r -f -v ${CONF_DIR}/*.ring.gz
 
 echo "Create new rings"
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder create ${PARTITION_SIZE_POWER} ${REPLICAS} ${HOURS}
 
 echo "Create new zones and add devices"
 zoneidx=1
@@ -31,9 +31,9 @@ for zone in ${ZONES[@]};do
 	for node in ${nodes[@]};do
 		devidx=0
 		for device in ${DEVICES[@]};do
-			sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder add z${zoneidx}-${node}:6010/${device} ${DEVICES_WEIGHTS#[devidx]}
-			sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder add z${zoneidx}-${node}:6011/${device} ${DEVICES_WEIGHTS[devidx]}
-			sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder add z${zoneidx}-${node}:6012/${device} ${DEVICES_WEIGHTS[devidx]}
+			sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder add z${zoneidx}-${node}:6010/${device} ${DEVICES_WEIGHTS#[devidx]}
+			sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder add z${zoneidx}-${node}:6011/${device} ${DEVICES_WEIGHTS[devidx]}
+			sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder add z${zoneidx}-${node}:6012/${device} ${DEVICES_WEIGHTS[devidx]}
 			devidx=$[devidx+1]
 		done
 	done
@@ -41,9 +41,9 @@ for zone in ${ZONES[@]};do
 done
 
 echo "Rebalance"
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder rebalance
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder rebalance
-sshpass -p ${PASS_ROOT} ssh root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder rebalance
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/object.builder rebalance
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/container.builder rebalance
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${op_host} swift-ring-builder ${CONF_DIR}/account.builder rebalance
 
 echo "Copy the ring file to other nodes"
 
@@ -72,9 +72,9 @@ for zone in ${ZONES[@]};do
 	for node in ${nodes[@]}
 	do
 		echo "Starting swift@"${node}
-		sshpass -p ${PASS_ROOT} ssh root@${node} swift-init all restart 1>/dev/null 2>&1
+		sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${node} swift-init all restart 1>/dev/null 2>&1
 		sleep 5
 	done
 done
 
-echo "Done"
+echo "Config swift done"

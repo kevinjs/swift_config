@@ -8,12 +8,12 @@ then
 else
 	echo "HAProxy host: "${HAPROXY_HOST}
 
-	is_Exist=`sshpass -p ${PASS_ROOT} ssh root@${HAPROXY_HOST} dpkg -l | grep haproxy`
+	is_Exist=`sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${HAPROXY_HOST} dpkg -l | grep haproxy`
 
 	if [ -z "${is_Exist}" ]
 	then
 		echo "Installing HAProxy"
-		sshpass -p ${PASS_ROOT} ssh root@${HAPROXY_HOST} apt-get -y --force-yes install haproxy
+		sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${HAPROXY_HOST} apt-get -y --force-yes install haproxy
 	fi
 	
 cat > /var/test_haproxy.cfg << _wrtend_
@@ -79,5 +79,9 @@ _wrtend_
 	sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${AUTH_HOST} keystone --os-username admin --os_password ${PASS_AUTH} --os_tenant_name admin --os_auth_url http://${AUTH_HOST}:5000/v2.0 endpoint-delete ${endpoint_id}
 	
 	rm -rf /var/test_haproxy.cfg
+
+	echo "Config HAProxy done"
+	echo "The statistics page is http://${HAPROXY_HOST}:8888/haproxy_stats"
+        echo "admin/admin"
 fi
 
