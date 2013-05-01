@@ -1,0 +1,25 @@
+#/bin/bash
+#PROXY_NODES="localhost"
+#STORAGE_NODES="localhost"
+
+CONF_DIR=/etc/swift
+PASS_ROOT=cnic.cn
+
+zone1=(192.168.64.221)
+zone2=(192.168.64.222)
+zone3=(192.168.64.223)
+zone4=(192.168.64.224)
+ZONES=(zone1 zone2 zone3 zone4)
+
+PARTITION_SIZE_POWER=18
+REPLICAS=3
+HOURS=1
+
+DEVICES=(sdb1)
+DEVICES_WEIGHTS=(100)
+
+AUTH_HOST=192.168.64.221
+PASS_AUTH=csdb123
+
+HAPROXY_HOST=192.168.64.221
+HAPROXY_CONF_DIR=/etc/haproxy
