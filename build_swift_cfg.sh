@@ -1,4 +1,6 @@
 #!/bin/bash
+# Configuration of Swift.
+# jingshao_AT_cnic_DOT_cn May 2. 2013
 
 CONF_DIR=/etc/swift
 PASS_ROOT=cnic.cn

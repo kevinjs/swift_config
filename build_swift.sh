@@ -1,4 +1,6 @@
 #!/bin/bash
+# Config Swift.
+# jingshao_AT_cnic_DOT_cn May 2. 2013
 
 . ./build_swift_cfg.sh
 

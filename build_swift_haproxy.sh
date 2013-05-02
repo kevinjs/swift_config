@@ -1,4 +1,6 @@
 #!/bin/bash
+# Config HAproxy tool for Swift.
+# jingshao_AT_cnic_DOT_cn May 2. 2013
 
 . ./build_swift_cfg.sh
 
@@ -53,14 +55,12 @@ listen	swift	0.0.0.0:8081
 	maxconn 20000
 _wrtend_
 
-	hostidx=1
 	for zone in ${ZONES[@]};do
 		eval nodes=\${$zone[@]}
 		for node in ${nodes[@]}
 		do
-			echo "	server swift${hostidx} ${node}:8080 maxconn 5000" >> /var/test_haproxy.cfg
+			echo "	server swift_${node} ${node}:8080 maxconn 5000" >> /var/test_haproxy.cfg
 		done
-		hostidx=$[hostidx+1]
 	done
 
 	sshpass -p ${PASS_ROOT} scp -o StrictHostKeyChecking=no /var/test_haproxy.cfg ${HAPROXY_HOST}:${HAPROXY_CONF_DIR}/haproxy.cfg
