@@ -1,6 +1,7 @@
 #!/bin/bash
 # Config Swift.
 # jingshao_AT_cnic_DOT_cn May 2. 2013
+# last edit May 19. 2013
 
 . ./build_swift_cfg.sh
 
@@ -67,6 +68,16 @@ for zone in ${ZONES[@]};do
 done
 
 rm -rf /tmp/tmp_scpfile
+
+swift_service_id=`sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${AUTH_HOST} keystone --os-username admin --os_password ${PASS_AUTH} --os_tenant_name admin --os_auth_url http://${AUTH_HOST}:5000/v2.0 service-list | grep object-store | awk '{print $2}'`
+
+endpoint_id=`sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${AUTH_HOST} keystone --os-username admin --os_password ${PASS_AUTH} --os_tenant_name admin --os_auth_url http://${AUTH_HOST}:5000/v2.0 endpoint-list | grep ${swift_service_id} | awk '{print $2}'`
+
+echo "Create new endpoint"
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${AUTH_HOST} keystone --os-username admin --os_password ${PASS_AUTH} --os_tenant_name admin --os_auth_url http://${AUTH_HOST}:5000/v2.0 endpoint-create --region RegionOne --service-id=${swift_service_id} --publicurl="http://${HAPROXY_HOST}:8080/v1/AUTH_\$\(tenant_id\)s" --adminurl=http://${HAPROXY_HOST}:8080 --internalurl="http://${HAPROXY_HOST}:8080/v1/AUTH_\$\(tenant_id\)s"
+
+echo "Delete old endpoint"
+sshpass -p ${PASS_ROOT} ssh -o StrictHostKeyChecking=no root@${AUTH_HOST} keystone --os-username admin --os_password ${PASS_AUTH} --os_tenant_name admin --os_auth_url http://${AUTH_HOST}:5000/v2.0 endpoint-delete ${endpoint_id}
 
 echo "Starting swift on all nodes"
 for zone in ${ZONES[@]};do
